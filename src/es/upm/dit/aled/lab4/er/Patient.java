@@ -130,8 +130,11 @@ public class Patient extends Thread {
 	 * movement is animated by the GUI and the index is increased by one.
 	 */
 	private void advanceProtocol() {
-		// TODO
-	}
+	    Transfer transfer = protocol.get(indexProtocol);   
+	    System.out.println("Paciente " + number + " moviéndose hacia " + transfer.getTo().getName());	    
+	    EmergencyRoomGUI.getInstance().animateTransfer(this, transfer);
+	    location = transfer.getTo();
+	    indexProtocol++;	}
 
 	/**
 	 * Simulates the treatment of the Patient at its current location. Therefore,
@@ -139,7 +142,12 @@ public class Patient extends Thread {
 	 * Area.
 	 */
 	private void attendedAtLocation() {
-		// TODO
+		try {
+	        System.out.println("Paciente " + number + " atendido en " + location.getName());
+	        Thread.sleep(location.getTime());
+	    } catch (InterruptedException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	/**
@@ -149,7 +157,13 @@ public class Patient extends Thread {
 	 */
 	@Override
 	public void run() {
-		// TODO
+	    while (indexProtocol < protocol.size()) {
+	        attendedAtLocation();     
+	        advanceProtocol();      
+	    }
+	    attendedAtLocation();
+	    EmergencyRoomGUI.getInstance().removePatient(this);
+	    System.out.println("Paciente " + number + " ha terminado su protocolo.");
 	}
 
 }
