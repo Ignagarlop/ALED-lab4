@@ -31,7 +31,10 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 * @param pattern The pattern to be found.
 	 */
 	public FASTASearchCallable(FASTAReaderThreads reader, int lo, int hi, byte[] pattern) {
-		// TODO
+		this.reader = reader;
+	    this.lo = lo;
+	    this.hi = hi;
+	    this.pattern = pattern;
 	}
 
 	/**
@@ -44,8 +47,15 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 */
 	@Override
 	public List<Integer> call() throws Exception {
-		// TODO
-		return null;
+		List<Integer> positions = new ArrayList<>();
+	    byte[] content = reader.getContent();
+
+	    for (int i = lo; i < hi - pattern.length; i++) {
+	        if (compare(content, i, pattern)) {
+	            positions.add(i);
+	        }
+	    }
+	    return positions;		
 	}
 
 	/*
@@ -58,7 +68,7 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 * Returns true if the pattern is present at the given position; false
 	 * otherwise.
 	 */
-	private boolean compare(byte[] pattern, int position) throws FASTAException {
+	private boolean compare(byte[] pattern, int position, byte[] pattern2) throws FASTAException {
 		if (position + pattern.length > reader.getValidBytes()) {
 			throw new FASTAException("Pattern goes beyond the end of the FASTA file.");
 		}
